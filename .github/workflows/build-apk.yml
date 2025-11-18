@@ -1,0 +1,72 @@
+name: Build and Release APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Setup Expo
+      uses: expo/expo-github-action@v8
+      with:
+        expo-version: latest
+        eas-version: latest
+        token: ${{ secrets.EXPO_TOKEN }}
+        
+    - name: Install EAS CLI
+      run: npm install -g eas-cli
+      
+    - name: Build APK
+      run: eas build -p android --profile preview --non-interactive
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        
+    - name: Download APK
+      run: |
+        # Get the latest build URL
+        BUILD_URL=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].artifacts.buildUrl')
+        wget -O fkart.apk "$BUILD_URL"
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: fkart.apk
+        tag_name: ${{ github.ref_name }}
+        name: FKart ${{ github.ref_name }}
+        body: |
+          ## 🎉 FKart Release
+          
+          ### 📱 APK Download
+          Download the APK file from the assets below.
+          
+          ### ✨ Features
+          - Complete e-commerce UI
+          - Shopping cart functionality
+          - Beautiful orange & blue theme
+          - 10+ screens
+          
+          ### 📥 Installation
+          1. Download the APK
+          2. Enable "Install from Unknown Sources" on Android
+          3. Install and enjoy!
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

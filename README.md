@@ -120,6 +120,16 @@ npx expo build:android -t apk
 
 After the build completes, you'll receive a download link for your APK file.
 
+### 📥 Download APK
+
+**Latest Release:** [Download APK from GitHub Releases](https://github.com/franklinfun/fkart/releases/latest)
+
+1. Go to [Releases](https://github.com/franklinfun/fkart/releases)
+2. Download the latest APK file
+3. Install on your Android device
+
+**Note:** Enable "Install from Unknown Sources" in Android settings before installing.
+
 ---
 
 ## 🎨 Theme Colors
